@@ -45,7 +45,42 @@ describe("QuoteForm", () => {
     release?.({ ok: false, status: 503, json: async () => ({ ok: false, code: "NO_DESTINATION" }) });
     await waitFor(() => expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(false));
   });
-  it("shows success only after a confirmed response", async () => {
+  it("shows success only after a confirmed response and fires generate_lead", async () => {
+    const gtagMock = vi.fn();
+    vi.stubGlobal("gtag", gtagMock);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => ({ ok: true }) }));
+    render(<QuoteForm />);
+    fill();
+    fireEvent.click(screen.getByRole("button", { name: "QUERO MINHA COTAÇÃO" }));
+    await waitFor(() => expect(screen.getByText(/solicitação recebida/i)).toBeTruthy());
+    expect(gtagMock).toHaveBeenCalledTimes(1);
+    expect(gtagMock).toHaveBeenCalledWith("event", "generate_lead");
+  });
+  it("does not fire generate_lead if API returns error", async () => {
+    const gtagMock = vi.fn();
+    vi.stubGlobal("gtag", gtagMock);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 503, json: async () => ({ ok: false }) }));
+    render(<QuoteForm />);
+    fill();
+    fireEvent.click(screen.getByRole("button", { name: "QUERO MINHA COTAÇÃO" }));
+    await waitFor(() => expect(screen.getByText(/Não foi possível enviar sua solicitação/i)).toBeTruthy());
+    expect(gtagMock).not.toHaveBeenCalled();
+  });
+  it("works normally even if Analytics is unavailable", async () => {
+    // gtag explicitly undefined
+    vi.stubGlobal("gtag", undefined);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => ({ ok: true }) }));
+    render(<QuoteForm />);
+    fill();
+    fireEvent.click(screen.getByRole("button", { name: "QUERO MINHA COTAÇÃO" }));
+    await waitFor(() => expect(screen.getByText(/solicitação recebida/i)).toBeTruthy());
+  });
+  it("works normally even if Analytics throws an exception", async () => {
+    // gtag explicitly throws
+    const gtagThrowsMock = vi.fn().mockImplementation(() => {
+      throw new Error("Analytics blocked by browser extension");
+    });
+    vi.stubGlobal("gtag", gtagThrowsMock);
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => ({ ok: true }) }));
     render(<QuoteForm />);
     fill();

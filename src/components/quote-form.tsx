@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, type FormEvent } from "react";
 import { parseLeadInput } from "@/lib/leads/schema";
 import type { LeadInput } from "@/lib/leads/destination";
+import { trackLeadConversion } from "@/lib/analytics";
 
 type Fields = { name: string; whatsapp: string; city: string; uf: string; category: string; tireDescription: string; website: string };
 const initial: Fields = { name: "", whatsapp: "", city: "", uf: "", category: "", tireDescription: "", website: "" };
@@ -67,6 +68,7 @@ export function QuoteForm({ whatsappNumber }: { whatsappNumber?: string }) {
         setConfirmedLead(parsed.value);
         setState("success");
         setMessage("Solicitação recebida! Nossa equipe entrará em contato com você.");
+        trackLeadConversion();
       } else {
         setState("error");
         setMessage("Não foi possível enviar sua solicitação agora. Tente novamente em instantes.");
