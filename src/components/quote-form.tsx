@@ -14,7 +14,11 @@ export function QuoteForm({ whatsappNumber }: { whatsappNumber?: string }) {
   const [state, setState] = useState<"idle" | "loading" | "error" | "success">("idle");
   const [message, setMessage] = useState("");
   const [confirmedLead, setConfirmedLead] = useState<LeadInput>();
-  const [utms, setUtms] = useState({ utmSource: "SITE", utmMedium: "", utmCampaign: "" });
+  const [utms, setUtms] = useState({ 
+    utmSource: "SITE", utmMedium: "", utmCampaign: "", utmContent: "", utmTerm: "", 
+    gclid: "", fbclid: "", referrer: "", landingPage: "" 
+  });
+  const [requestId, setRequestId] = useState("");
   const busy = useRef(false);
 
   useEffect(() => {
@@ -22,15 +26,28 @@ export function QuoteForm({ whatsappNumber }: { whatsappNumber?: string }) {
     const source = params.get("utm_source");
     const medium = params.get("utm_medium");
     const campaign = params.get("utm_campaign");
+    const content = params.get("utm_content");
+    const term = params.get("utm_term");
+    const gclid = params.get("gclid");
+    const fbclid = params.get("fbclid");
 
     const savedUtms = sessionStorage.getItem("utms");
-    let currentUtms = savedUtms ? JSON.parse(savedUtms) : { utmSource: "SITE", utmMedium: "", utmCampaign: "" };
+    let currentUtms = savedUtms ? JSON.parse(savedUtms) : { 
+      utmSource: "SITE", utmMedium: "", utmCampaign: "", utmContent: "", utmTerm: "",
+      gclid: "", fbclid: "", referrer: document.referrer, landingPage: window.location.pathname
+    };
 
-    if (source || medium || campaign) {
+    if (source || medium || campaign || content || term || gclid || fbclid) {
       currentUtms = {
-        utmSource: source || "SITE",
-        utmMedium: medium || "",
-        utmCampaign: campaign || ""
+        utmSource: source || currentUtms.utmSource,
+        utmMedium: medium || currentUtms.utmMedium,
+        utmCampaign: campaign || currentUtms.utmCampaign,
+        utmContent: content || currentUtms.utmContent,
+        utmTerm: term || currentUtms.utmTerm,
+        gclid: gclid || currentUtms.gclid,
+        fbclid: fbclid || currentUtms.fbclid,
+        referrer: currentUtms.referrer || document.referrer,
+        landingPage: currentUtms.landingPage || window.location.pathname
       };
       sessionStorage.setItem("utms", JSON.stringify(currentUtms));
     }
@@ -57,11 +74,15 @@ export function QuoteForm({ whatsappNumber }: { whatsappNumber?: string }) {
     busy.current = true;
     setState("loading");
     setMessage("Enviando sua solicitação...");
+    
+    const currentRequestId = requestId || crypto.randomUUID();
+    if (!requestId) setRequestId(currentRequestId);
+    
     try {
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...parsed.value, website: fields.website }),
+        body: JSON.stringify({ ...parsed.value, website: fields.website, requestId: currentRequestId }),
       });
       const body = await response.json();
       if (response.ok && body.ok === true) {
@@ -69,6 +90,8 @@ export function QuoteForm({ whatsappNumber }: { whatsappNumber?: string }) {
         setState("success");
         setMessage("Solicitação recebida! Nossa equipe entrará em contato com você.");
         trackLeadConversion();
+        // Generate new requestId for future submissions
+        setRequestId(crypto.randomUUID());
       } else {
         setState("error");
         setMessage("Não foi possível enviar sua solicitação agora. Tente novamente em instantes.");

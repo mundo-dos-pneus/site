@@ -8,7 +8,7 @@ export class GoogleScriptDestination implements LeadDestination {
     private readonly apiSecret: string
   ) {}
 
-  async send(lead: LeadInput, _requestId: string): Promise<{ accepted: boolean; receiptId?: string }> {
+  async send(lead: LeadInput): Promise<{ accepted: boolean; receiptId?: string }> {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout

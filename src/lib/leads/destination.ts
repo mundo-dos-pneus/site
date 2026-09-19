@@ -8,6 +8,15 @@ export type LeadInput = {
   utmSource?: string;
   utmMedium?: string;
   utmCampaign?: string;
+  utmContent?: string;
+  utmTerm?: string;
+  gclid?: string;
+  fbclid?: string;
+  referrer?: string;
+  landingPage?: string;
+  requestId?: string;
+  remoteIp?: string;
+  userAgent?: string;
 };
 
 export type LeadDestination = {

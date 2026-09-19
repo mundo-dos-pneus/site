@@ -24,7 +24,7 @@ describe("GoogleScriptDestination", () => {
     vi.stubGlobal("fetch", fetch);
 
     const dest = new GoogleScriptDestination("https://test", "secret-123");
-    const result = await dest.send(valid, "req-1");
+    const result = await dest.send(valid);
     
     expect(result.accepted).toBe(true);
     expect(result.receiptId).toBe("MDP-123");
@@ -45,7 +45,7 @@ describe("GoogleScriptDestination", () => {
     vi.stubGlobal("fetch", fetch);
 
     const dest = new GoogleScriptDestination("https://test", "secret-123");
-    const result = await dest.send(valid, "req-2");
+    const result = await dest.send(valid);
     
     expect(result.accepted).toBe(true);
     expect(result.receiptId).toBe("MDP-124");
@@ -59,7 +59,7 @@ describe("GoogleScriptDestination", () => {
     vi.stubGlobal("fetch", fetch);
 
     const dest = new GoogleScriptDestination("https://test", "secret-123");
-    const result = await dest.send(valid, "req-3");
+    const result = await dest.send(valid);
     
     expect(result.accepted).toBe(true);
     expect(result.receiptId).toBe("MDP-125");
@@ -72,7 +72,7 @@ describe("GoogleScriptDestination", () => {
     }));
 
     const dest = new GoogleScriptDestination("https://test", "secret-123");
-    const result = await dest.send(valid, "req-1");
+    const result = await dest.send(valid);
     expect(result.accepted).toBe(false);
   });
 
@@ -83,7 +83,7 @@ describe("GoogleScriptDestination", () => {
     }));
 
     const dest = new GoogleScriptDestination("https://test", "secret-123");
-    const result = await dest.send(valid, "req-1");
+    const result = await dest.send(valid);
     expect(result.accepted).toBe(false);
   });
 
@@ -93,7 +93,7 @@ describe("GoogleScriptDestination", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("AbortError")));
 
     const dest = new GoogleScriptDestination("https://test", "secret-123");
-    const result = await dest.send(valid, "req-1");
+    const result = await dest.send(valid);
     expect(result.accepted).toBe(false);
   });
 });

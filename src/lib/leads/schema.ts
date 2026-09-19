@@ -27,8 +27,15 @@ export function parseLeadInput(value: unknown): { ok: true; value: LeadInput } |
   const utmSource = typeof input.utmSource === "string" ? input.utmSource.slice(0, 100) : "";
   const utmMedium = typeof input.utmMedium === "string" ? input.utmMedium.slice(0, 100) : "";
   const utmCampaign = typeof input.utmCampaign === "string" ? input.utmCampaign.slice(0, 100) : "";
+  const utmContent = typeof input.utmContent === "string" ? input.utmContent.slice(0, 100) : "";
+  const utmTerm = typeof input.utmTerm === "string" ? input.utmTerm.slice(0, 100) : "";
+  const gclid = typeof input.gclid === "string" ? input.gclid.slice(0, 100) : "";
+  const fbclid = typeof input.fbclid === "string" ? input.fbclid.slice(0, 100) : "";
+  const referrer = typeof input.referrer === "string" ? input.referrer.slice(0, 500) : "";
+  const landingPage = typeof input.landingPage === "string" ? input.landingPage.slice(0, 500) : "";
+  const requestId = typeof input.requestId === "string" ? input.requestId : "";
 
   if (Object.keys(errors).length) return { ok: false, errors };
-  return { ok: true, value: { name, whatsapp, city, uf, category: category as LeadInput["category"], tireDescription, utmSource, utmMedium, utmCampaign } };
+  return { ok: true, value: { name, whatsapp, city, uf, category: category as LeadInput["category"], tireDescription, utmSource, utmMedium, utmCampaign, utmContent, utmTerm, gclid, fbclid, referrer, landingPage, requestId } };
 }
 
