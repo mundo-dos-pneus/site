@@ -12,7 +12,7 @@ const valid = {
 
 describe("parseLeadInput", () => {
   it("normalizes a valid lead", () => {
-    expect(parseLeadInput(valid)).toEqual({ ok: true, value: { ...valid, whatsapp: "16999991234", utmSource: "", utmMedium: "", utmCampaign: "", utmContent: "", utmTerm: "", gclid: "", fbclid: "", referrer: "", landingPage: "", requestId: "" } });
+    expect(parseLeadInput(valid)).toEqual({ ok: true, value: { ...valid, whatsapp: "+5516999991234", utmSource: "", utmMedium: "", utmCampaign: "", utmContent: "", utmTerm: "", gclid: "", fbclid: "", referrer: "", landingPage: "", requestId: "" } });
   });
   it("rejects missing fields", () => {
     const result = parseLeadInput({});

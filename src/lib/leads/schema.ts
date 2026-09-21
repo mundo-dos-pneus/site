@@ -1,4 +1,5 @@
 import type { LeadInput } from "./destination";
+import { normalizePhoneBR } from "./phone";
 
 const categories = new Set(["moto", "carro", "suv-picape", "caminhao", "agricola"]);
 const ufs = new Set(["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"]);
@@ -15,8 +16,12 @@ export function parseLeadInput(value: unknown): { ok: true; value: LeadInput } |
   const name = text("name", 2, 100);
   const city = text("city", 2, 100);
   const tireDescription = text("tireDescription", 3, 300);
-  const whatsapp = typeof input.whatsapp === "string" ? input.whatsapp.replace(/\D/g, "") : "";
-  if (!/^\d{10,11}$/.test(whatsapp)) errors.whatsapp = "Informe um WhatsApp válido com DDD.";
+  
+  const whatsappNormalized = normalizePhoneBR(input.whatsapp);
+  if (!whatsappNormalized) {
+    errors.whatsapp = "Informe um WhatsApp válido com DDD.";
+  }
+  const whatsapp = whatsappNormalized || "";
   
   const category = input.category;
   if (typeof category !== "string" || !categories.has(category)) errors.category = "Selecione uma categoria válida.";
@@ -38,4 +43,3 @@ export function parseLeadInput(value: unknown): { ok: true; value: LeadInput } |
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, value: { name, whatsapp, city, uf, category: category as LeadInput["category"], tireDescription, utmSource, utmMedium, utmCampaign, utmContent, utmTerm, gclid, fbclid, referrer, landingPage, requestId } };
 }
-
